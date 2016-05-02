@@ -17,7 +17,7 @@
 		button.value = place.name;
 		var buttonText = document.createTextNode(place.name);
 		button.appendChild(buttonText);
-		topbar.appendChild(button);
+		buttonContainer.appendChild(button);
 	  }
 	   // Make Buttons function -> calls Button Maker function in every element in a give array (we use the array where we stored our places objects).
 	  function makeButtons(array){
@@ -26,6 +26,15 @@
 		}
 	  }
 
+	  // This function will called by the for loop in the futureResults func.
+		function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL){
+			var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
+		
+			function displayWeather(data){
+				newResults = "<tr><td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td></tr>";
+				newResultsArray.push(newResults);
+			} 
+		}
 	  // Declared Variables
 	  //  A Container div -> to hold all elements in our html page.
       var container = document.createElement('div');
@@ -37,22 +46,18 @@
 	  var logoImg = document.createElement('img');
 	  logoImg.id = "logoImg";
 	  logoImg.src = "logo-small.png";
-	  var logo = document.createElement("h1")
-	  logo.id = "logo";
-	  logo.innerHTML = "Rio ";
-	  logo.appendChild(logoImg);
-	  logo.innerHTML += " Spots";
-	  logoDiv.appendChild(logo);
+	  logoDiv.appendChild(logoImg);
+
 
 	  // A topbar div -> holds our buttons, search bar and logo.
 	  var topbar = document.createElement('div');
 	  topbar.id = 'topbar';
-	  topbar.style.backgroundColor = "#00ff48";
-	  topbar.style.height = "25px";
-	  topbar.style.float = "bottom";
-	  topbar.style.padding = "0";
-	  topbar.style.float = "left";
 	  container.appendChild(topbar);
+	  // A Button Container
+	  var buttonContainer = document.createElement('div');
+	  buttonContainer.id = 'buttonContainer';
+	  topbar.appendChild(buttonContainer);
+
 	  // Create a title
 	  var titleDiv = document.createElement('div');
 	  titleDiv.id = "titleDiv";
@@ -87,6 +92,11 @@
 	  container.appendChild(footerDiv);	  
 	  // Create an array to hold all of our Google Maps Markers.
 	  var markers = [];
+	  // A Variable that will hold our returned resutls.
+	  var newResults;
+	  // An Array that will hold every newResults variable
+	  var newResultsArray = [];
+
 	  // Create the Places array -> where we will store all of our places' objects.
 	  var places = [];
 	  var urca = new Places('Urca', -22.955430, -43.164800, places);
@@ -103,12 +113,22 @@
 	  var grumari = new Places('Grumari', -23.048466, -43.524417, places);
 	  var guaratiba = new Places('Guaratiba', -23.067656, -43.567932, places);
 
+	  // The chunk of code below will get the current time in Rio in UNIX time (seconds since Jan 1st 1970). 
+	  var timeNow = Date.now();
+	  timeNow /= 1000;
+	  timeNow -= (86400 / 24) * 3;
+	  // The Next Time variable will add 12 hours to the timeNow variable
+	  var nextTime = timeNow + 43200;
+	  // The Time variable is the one that will be used in the API call, the Math.round method rounds our number to it's nearest whole number.
+	  var TIME = Math.round(nextTime);
+	  // The Time Intervals will be of 12 hours
+	  var INTERVAL = 12;
+
 	  // Wiring Things Together
 	   // A jQuery function -> when document has loaded this function runs.
 	  $(document).ready(function(){
 		// Here we call the Make Buttons function giving it our Places array. 
 		makeButtons(places);
-
 		(function createInitialTable (){
 			// Next, we declare all the variables we'll need for the API call
 			// 	- The API key, Latitude and Longitude are necessary for the API's URL.
@@ -116,7 +136,6 @@
 			var LATITUDE = -22.986450;
 			var LONGITUDE = -43.205995;
 			// Here we generate a simple title.
-		//	container.innerHTML += '<h2 align="center">' + "Rio de Janeiro"+ "</h2>";
 			// Here we declare our API's variable -> it is simply a string holding the API's url and our variables are concatenated into it. 
 			var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "?callback=?";
 			// Finally, we have our callback function -> it takes in our data (JSON data that gets returned from the API request) and displays it to our webpage as a table.
@@ -133,121 +152,105 @@
 			$.getJSON(weatherAPI, displayWeather);	
 			// Add our Results div to our Container div and effectively	display our results.
 			resultsTable.appendChild(results);
-				// The chunk of code below will get the current time in Rio in UNIX time (seconds since Jan 1st 1970). 
-				var timeNow = Date.now();
-				timeNow /= 1000;
-				timeNow -= (86400 / 24) * 3;
-				// The Next Time variable will add 12 hours to the timeNow variable
-				var nextTime = timeNow + 43200;
-				// The Time variable is the one that will be used in the API call, the Math.round method rounds our number to it's nearest whole number.
-				var TIME = Math.round(nextTime);
-				// The Time Intervals will be of 12 hours
-				var INTERVAL = 12;
 
-				futureResults.innerHTML += "<th>Moment</th><th>Summary</th><th>Temperature</th><th>Wind Speed</th><th>Chance of Rain</th><th>Humidity</th><th>Pressure</th>";
-				// Lastly, we have a for loop that will print our results for the next 10 12-hour intervals.
-				for (var i = 1; i <= 10; i++){
-					loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL);
-					TIME += 43200;
-					INTERVAL += 12;	
-
-				}
-
-				// This function will called by the for loop in the futureResults func.
-			function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL){
-					var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
-		
-					function displayWeather(data){
-							
-							futureResults.innerHTML += "<td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td>";
-							futureResults.innerHTML += "</tr>";
-							} 
-
-				$.getJSON(weatherAPI, displayWeather);	
-						
-				resultsTable.appendChild(futureResults);	
+			futureResults.innerHTML += "<th>Moment</th><th>Summary</th><th>Temperature</th><th>Wind Speed</th><th>Chance of Rain</th><th>Humidity</th><th>Pressure</th>";
+			// Lastly, we have a for loop that will print our results for the next 10 12-hour intervals.
+			for (var i = 1; i <= 10; i++){
+			loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL);
+			TIME += 43200;
+			INTERVAL += 12;	
 			}
-			
-		})();
+
+			// This function will called by the for loop in the futureResults func.
+			function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL){
+				var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
+	
+				function displayWeather(data){
+						
+						newResults = "<tr><td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td></tr>";
+						newResultsArray.push(newResults);
+
+						} 
+
+			};
 		
 		// Another jQuery function -> when any button is clicked a table is created and the CURRENT weather conditions are displayed:
 		// - This is our API call to receive our current results.
-		$("body").on('click', 'button', function resultsFunc(){
-			// This function will be called to display the results of the future moments.
-			function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL, TITLE){
-				var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
-				function displayWeather(data){
-						futureResults.innerHTML += "<td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td>";
-						futureResults.innerHTML += "</tr>";
-						} 
+		// $("body").on('click', 'button', function resultsFunc(){
 
-				$.getJSON(weatherAPI, displayWeather);	
+		// 	// First we clear our Results div -> so that when we call it a second time, our first results disappear.
+		// 	results.innerHTML = " ";
+		// 	futureResults.innerHTML = " ";
+		// 	// Next, we declare all the variables we'll need for the API call
+		// 	// 	- The API key, Latitude and Longitude are necessary for the API's URL.
+		// 	var APIKEY = "e964d33cde30c141523b46f7f27e0007";
+		// 	var LATITUDE;
+		// 	var LONGITUDE;
+		// 	//  - The Button Value variable will get (via jQuery) the text for each button and will ube used as the title for our results.
+		// 	var btnValue = $(this).text();
+		// 	// This 'for' loop will go over the places array and check if our Button's text value matches any of our places' names. If so it will set our Latitude and Longitude varibles as the Latitude and Longitude of the matched object.
+		// 	for(var i = 0; i < places.length; i++){
+		// 		if(btnValue == places[i]["name"]){
+		// 			LATITUDE = places[i]["latitude"];
+		// 			LONGITUDE = places[i]["longitude"];
+		// 		}		
+		// 	}
+		// 	// Here we declare our API's variable -> it is simply a string holding the API's url and our variables are concatenated into it. 
+		// 	var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "?callback=?";
+		// 	// Finally, we have our callback function -> it takes in our data (JSON data that gets returned from the API request) and displays it to our webpage as a table.
+		// 	function displayWeather(data){
+		// 		title.innerHTML = btnValue;
+		// 		results.innerHTML += "<th>Currently</th>";
+		// 		results.innerHTML += "<td>Summary:  " + data.currently.summary + "</td>";
+		// 		results.innerHTML += "<td>Temperature:  " + data.currently.temperature + " ºF </td>";
+		// 		results.innerHTML += "<td>Wind Speed:  " + data.currently.windSpeed + " mpf </td>";
+		// 		results.innerHTML += "<td>Chance of Rain:  " + Math.round(data.currently.precipProbability * 100) + "% </td>";
+		// 		results.innerHTML += "<td>Humidity:  " + Math.round(data.currently.humidity * 100) + "% </td>";
+		// 		results.innerHTML += "<td>Pressure:  " + data.currently.pressure + " mb </td>";
+
+		// 	}	
+		// 	// Lastly, our jQuery .getJSON method manages our API request taking in our URL and callback function.
+		// 	$.getJSON(weatherAPI, displayWeather);	
+		// 	// Add our Results div to our Container div and effectively	display our results.
+		// 	resultsTable.appendChild(results);
+
+		// 	// The chunk of code below will get the current time in Rio in UNIX time (seconds since Jan 1st 1970). 
+		// 	var timeNow = Date.now();
+		// 	timeNow /= 1000;
+		// 	timeNow -= (86400 / 24) * 3;
+		// 	// The Next Time variable will add 12 hours to the timeNow variable
+		// 	var nextTime = timeNow + 43200;
+		// 	// The Time variable is the one that will be used in the API call, the Math.round method rounds our number to it's nearest whole number.
+		// 	var TIME = Math.round(nextTime);
+		// 	// The Time Intervals will be of 12 hours
+		// 	var INTERVAL = 12;
+		// 	futureResults.innerHTML += "<th>Moment</th><th>Summary</th><th>Temperature</th><th>Wind Speed</th><th>Chance of Rain</th><th>Humidity</th><th>Pressure</th>";
+		// 	// Lastly, we have a for loop that will print our results for the next 10 12-hour intervals.
+		// 	for (var i = 1; i <= 10; i++)
+		// 	loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL);
+		// 	TIME += 43200;
+		// 	INTERVAL += 12;	
+		// 	}
+
+		// 	// This function will called by the for loop in the futureResults func.
+		// 	function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL){
+		// 		var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
+	
+		// 		function displayWeather(data){
 						
-				resultsTable.appendChild(futureResults);	
-			}
-			// First we clear our Results div -> so that when we call it a second time, our first results disappear.
-			// resultsContainer.innerHTML = " ";
+		// 				newResults = "<tr><td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td></tr>";
+		// 				newResultsArray.push(newResults);
 
-			results.innerHTML = " ";
-			futureResults.innerHTML = " ";
-			// Next, we declare all the variables we'll need for the API call
-			// 	- The API key, Latitude and Longitude are necessary for the API's URL.
-			var APIKEY = "e964d33cde30c141523b46f7f27e0007";
-			var LATITUDE;
-			var LONGITUDE;
-			//  - The Button Value variable will get (via jQuery) the text for each button and will ube used as the title for our results.
-			var btnValue = $(this).text();
-			// This 'for' loop will go over the places array and check if our Button's text value matches any of our places' names. If so it will set our Latitude and Longitude varibles as the Latitude and Longitude of the matched object.
-			for(var i = 0; i < places.length; i++){
-				if(btnValue == places[i]["name"]){
-					LATITUDE = places[i]["latitude"];
-					LONGITUDE = places[i]["longitude"];
-				}		
-			}
-			// Here we declare our API's variable -> it is simply a string holding the API's url and our variables are concatenated into it. 
-			var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "?callback=?";
-			// Finally, we have our callback function -> it takes in our data (JSON data that gets returned from the API request) and displays it to our webpage as a table.
-			function displayWeather(data){
-				title.innerHTML = btnValue;
-				results.innerHTML += "<th>Currently</th>";
-				results.innerHTML += "<td>Summary:  " + data.currently.summary + "</td>";
-				results.innerHTML += "<td>Temperature:  " + data.currently.temperature + " ºF </td>";
-				results.innerHTML += "<td>Wind Speed:  " + data.currently.windSpeed + " mpf </td>";
-				results.innerHTML += "<td>Chance of Rain:  " + data.currently.precipProbability * 100 + "% </td>";
-				results.innerHTML += "<td>Humidity:  " + data.currently.humidity * 100 + "% </td>";
-				results.innerHTML += "<td>Pressure:  " + data.currently.pressure + " mb </td>";
+		// 				} 
 
-			}	
-			// Lastly, our jQuery .getJSON method manages our API request taking in our URL and callback function.
-			$.getJSON(weatherAPI, displayWeather);	
-			// Add our Results div to our Container div and effectively	display our results.
-			resultsTable.appendChild(results);
-
-				// The chunk of code below will get the current time in Rio in UNIX time (seconds since Jan 1st 1970). 
-				var timeNow = Date.now();
-				timeNow /= 1000;
-				timeNow -= (86400 / 24) * 3;
-				// The Next Time variable will add 12 hours to the timeNow variable
-				var nextTime = timeNow + 43200;
-				// The Time variable is the one that will be used in the API call, the Math.round method rounds our number to it's nearest whole number.
-				var TIME = Math.round(nextTime);
-				// The Time Intervals will be of 12 hours
-				var INTERVAL = 12;
-				var TITLE = btnValue;
-
-				futureResults.innerHTML += "<th>Moment</th><th>Summary</th><th>Temperature</th><th>Wind Speed</th><th>Chance of Rain</th><th>Humidity</th><th>Pressure</th>";
-				// Lastly, we have a for loop that will print our results for the next 10 12-hour intervals.
-				for (var i = 1; i <= 10; i++){
-					loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL, TITLE);
-					TIME += 43200;
-					INTERVAL += 12;	
-
-				}
-
+		// 	$.getJSON(weatherAPI, displayWeather);	
 			
-			});
 			
+			
+		// 	resultsTable.appendChild(futureResults);	
+		// }
+
    		document.body.appendChild(container);
-  	  });
-		
+  	  
+		});
 	

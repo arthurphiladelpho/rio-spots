@@ -2,57 +2,102 @@
 	        height: 100%;
 	        margin: 0;
 	        padding: 0;
+	        font-family: Verdana, Geneva, sans-serif;
 	      }
-	      button {
-	      	margin: 3px 3px 3px 3px;
-	      	text-align: center;
 
+	      h1 {
+	      	font-family: Impact, Charcoal, sans-serif;
+	      	font-variant: small-caps;
+	      	text-decoration: underline;
+	      	font-weight: bolder;
 	      }
+
+	      button {
+			margin: 3px;
+	      	text-align: center;
+	      	display: block;
+	      	float: left;
+	      	font-weight: bold;
+	      }
+
 	     table, th, td {
 			border: 1px solid black;
 			border-collapse: collapse;;
 		 }
+
 		 table {
 			margin: 8px;
+			font-family: "Comic Sans MS", cursive, sans-serif;
 		 }
+
 		 th {
+		 	text-decoration: underline;
 			padding: 5px;
-			}
+		 }
+
 		 td, h2 {
 		 	text-align: center;
-		 	font-color: blue;
 		 }
+
+		 h2 {
+		 	display: block;
+		 	padding: 10px;
+		 	color: #454545;
+		 	font-weight: bolder;
+		 	border-top: dashed;
+		 	border-bottom: dashed;
+		 }
+
+		 #container {
+		 	width: 900px;
+		 	margin: 0 auto;
+		 	border-style: groove;
+		 	border: 3px;
+		 	background-color: #e0f6ff;
+		 }
+
 		 #logoDiv {
-		 	margin: 0px;
-		 }
-		   #map {
+    		text-align: center;
+    		padding: 20px;
+    	}
+		
+		 #topbar {
+		 	background-color: #0089de;
+			height: 25px;
+			width: 100%;
+    		margin: 0px;
+    	}
+
+    	#buttonContainer {
+    		width: 810px;
+    		margin: 0 auto;
+    	}
+    	
+		#map {
 	        height: 250px;
-	       	margin: 5px;
+	       	margin: 0 auto;
 	        width: 100%;
 	        float: left;
+
 	      }
+		
 		#results {
 			font-size: 1.2em;
 		}
-		#topbar {
-			margin: auto;
-			width: 100%;
-    		border: 3px solid #73AD21;
-    	}
-    	#logo {
-    		text-align: center;
-    	}
-    	#titleDiv {
-    		margin-top: 75px;
-    	}
+    	
     	#footerDiv {
     		width: 100%;
     		height: 50px;
     		background-color: #ea2d41;
     	}
+    	
     	#resultsTable {
     		width:100%;
+    		border-style: none;
+
     	}
+    	
     	#results, #futureResults {
     		width: 80%;
+    		margin-left: 80px;
     	}
