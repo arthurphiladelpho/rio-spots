@@ -1,0 +1,26 @@
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script>
+	var INTERVAL = 12;
+	var TIME = Date.now();
+	var index = 0;
+	var APIKEY = "e964d33cde30c141523b46f7f27e0007";
+	var LATITUDE = -22.986450;
+	var LONGITUDE = -43.205995;
+	
+
+	$(document).ready(function(){
+		
+		function createInitialTable (intervalo, tempo, ind){
+	   
+		    var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + tempo + "?callback=?";
+		    function displayWeather(data){
+		    	console.log(data);
+		    } 
+		    $.getJSON(weatherAPI, displayWeather);    
+		}
+	
+		createInitialTable(INTERVAL, TIME, index);
+	
+	});
+</script>

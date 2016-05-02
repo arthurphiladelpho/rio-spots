@@ -33,3 +33,11 @@
 				markers.push([marker, places[i]["name"]]);
 	        } // End of for loop.
 	    } // End of initMap function.
+		  function showMarker(marker){
+			    var gMarker = marker.title;
+			    var center = marker.position;
+			    console.log(marker);
+			    google.maps.event.trigger(gMarker, 'click', {
+			        latLng: center
+			    });
+			}

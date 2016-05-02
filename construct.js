@@ -81,6 +81,7 @@
 	var button = document.createElement('button');
 	button.id = place.name;
 	button.value = place.name;
+  // button.addEventListener("click", showMarker(this), false);
 	var buttonText = document.createTextNode(place.name);
 	button.appendChild(buttonText);
 	buttonContainer.appendChild(button);
@@ -92,14 +93,14 @@
     }
   }
 // This function will called by the for loop in the futureResults func.
-function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL){
-  var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
+// function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL){
+//   var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
 
-  function displayWeather(data){
-    newResults = "<tr><td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td></tr>";
-	newResultsArray.push(newResults);
-	} 
-}
+//   function displayWeather(data){
+//     newResults = "<tr><td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td></tr>";
+// 	newResultsArray.push(newResults);
+// 	} 
+// }
 
 // Create the Places array -> where we will store all of our places' objects.
 var places = [];
@@ -136,29 +137,49 @@ $(document).ready(function(){
     $.getJSON(weatherAPI, displayWeather);
     resultsTable.appendChild(currentResults); 
   })();
-  (function createInitialFutureResultsTable (){
+
+  function createInitialFutureResultsTable (intervalo, tempo, ind){
     var APIKEY = "e964d33cde30c141523b46f7f27e0007";
     var LATITUDE = -22.986450;
     var LONGITUDE = -43.205995;
-    var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + TIME + "?callback=?";
-    // function loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL){    
-        function displayWeather(data){
-            newResults = "<tr><td>" + "In " + INTERVAL + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td></tr>";
-            futureResults.innerHTML += newResults;     
-        } 
-    //};
-    
-    $.getJSON(weatherAPI, displayWeather);
-     futureResults.innerHTML += "<th>Moment</th><th>Summary</th><th>Temperature</th><th>Wind Speed</th><th>Chance of Rain</th><th>Humidity</th><th>Pressure</th>";
-    // for (var i = 1; i <= 10; i++){
-    //   loopFutureResults(APIKEY, LATITUDE, LONGITUDE, TIME, INTERVAL);
-    //   TIME += 43200;
-    //   INTERVAL += 12; 
-    // }
-    resultsTable.appendChild(futureResults); 
-  })()
+    var weatherAPI = "https://api.forecast.io/forecast/" + APIKEY + "/" + LATITUDE + "," + LONGITUDE + "," + tempo + "?callback=?";
+    function displayWeather(data){
+      newResultsArray[ind] = "<tr><td>" + "In " + intervalo + " hours" + "</td><td>" + data.currently.summary + "</td><td>" + data.currently.temperature + " ºF </td><td>" + data.currently.windSpeed + " mph </td><td>" + Math.round(data.currently.precipProbability * 100) + "% </td><td>" + Math.round(data.currently.humidity * 100) + "% </td><td>" + data.currently.pressure + " mb </td></tr>";
+      // newResultsArray[ind] = (newResults);
+      // futureResults.innerHTML += newResults;
+    } 
+    $.getJSON(weatherAPI, displayWeather);    
+  }
+  
 
-  document.body.appendChild(container);
+  for (var i = 0; i <= 10; i++){
+      createInitialFutureResultsTable(INTERVAL, TIME, i);
+      INTERVAL += 12;
+      TIME += 43200;
+    }
+   
+    setTimeout(function(){ 
+      futureResults.innerHTML += "<th>Moment</th><th>Summary</th><th>Temperature</th><th>Wind Speed</th><th>Chance of Rain</th><th>Humidity</th><th>Pressure</th>";
+     for(var i = 0; i <= 10; i++){
+      futureResults.innerHTML += newResultsArray[i];
+     }
+     resultsTable.appendChild(futureResults);
+     document.body.appendChild(container);
+    }, 5000);
 
+  // $.when(newResultsArray.length == 10).done(function populateTable(){
+  //    futureResults.innerHTML += "<th>Moment</th><th>Summary</th><th>Temperature</th><th>Wind Speed</th><th>Chance of Rain</th><th>Humidity</th><th>Pressure</th>";
+  //    for(var i = 0; i <= 10; i++){
+  //     futureResults.innerHTML += newResultsArray[i];
+  //    }
+  //    resultsTable.appendChild(futureResults);
+  //    document.body.appendChild(container);
+  //   })
+      
+     
+
+
+  
+ 
 });
 
